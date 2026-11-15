@@ -1,0 +1,18 @@
+# Metadata for the Comfy Registry (https://registry.comfy.org). Harmless if you only publish on GitHub.
+# Replace YOUR_GITHUB_USER and YOUR_PUBLISHER_ID before publishing.
+[project]
+name = "llama-server-text"
+version = "1.0.0"
+description = "Run GGUF language and vision models in ComfyUI through llama.cpp's llama-server: text and image-to-text generation, up to 5 images, per-GPU placement and automatic VRAM handling."
+license = { file = "LICENSE" }
+requires-python = ">=3.9"
+classifiers = ["Operating System :: OS Independent"]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/YOUR_GITHUB_USER/ComfyUI-LlamaServer-Text"
+"Bug Tracker" = "https://github.com/YOUR_GITHUB_USER/ComfyUI-LlamaServer-Text/issues"
+
+[tool.comfy]
+PublisherId = "YOUR_PUBLISHER_ID"
+DisplayName = "Generate Text (llama-server)"

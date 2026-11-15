@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+*.log
+llama_server_*.pid
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
