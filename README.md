@@ -44,7 +44,7 @@ in the middle of a generation workflow.
 
 ```
 cd ComfyUI/custom_nodes
-git clone https://github.com/YOUR_GITHUB_USER/ComfyUI-LlamaServer-Text
+git clone https://github.com/Skol600ml/ComfyUI-LlamaServer-Text
 ```
 
 Restart ComfyUI. The node appears under **utils > LLM > Generate Text (llama-server)**.

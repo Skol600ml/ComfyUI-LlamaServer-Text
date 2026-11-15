@@ -10,8 +10,8 @@ classifiers = ["Operating System :: OS Independent"]
 dependencies = []
 
 [project.urls]
-Repository = "https://github.com/YOUR_GITHUB_USER/ComfyUI-LlamaServer-Text"
-"Bug Tracker" = "https://github.com/YOUR_GITHUB_USER/ComfyUI-LlamaServer-Text/issues"
+Repository = "https://github.com/Skol600ml/ComfyUI-LlamaServer-Text"
+"Bug Tracker" = "https://github.com/Skol600ml/ComfyUI-LlamaServer-Text/issues"
 
 [tool.comfy]
 PublisherId = "YOUR_PUBLISHER_ID"
