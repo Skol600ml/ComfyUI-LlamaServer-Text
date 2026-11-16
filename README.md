@@ -9,7 +9,9 @@ back, and shuts the server down so the VRAM is free again for the rest of your w
 Typical uses: prompt writing/expansion, image-to-prompt, captioning, anything that needs a local LLM or VLM
 in the middle of a generation workflow.
 
-<!-- Add a screenshot of the node here: ![node](docs/node.png) -->
+<p align="center">
+  <img src="DOCS/Node.png" alt="Generate Text (llama-server) node" width="420">
+</p>
 
 ## Features
 
@@ -57,6 +59,12 @@ Restart ComfyUI. The node appears under **utils > LLM > Generate Text (llama-ser
    ComfyUI to refresh the lists.
 3. Add the node, pick the **model**, write a **prompt**, and run.
 4. For images: connect an `IMAGE` to `image`, and pick the matching **mmproj** (the file from the same model family).
+
+## Example workflow
+
+A sample of the node used inside a larger workflow (screenshot):
+
+![Example workflow](DOCS/Workflow%20Example.png)
 
 ## Where models are looked up
 

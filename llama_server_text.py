@@ -564,18 +564,75 @@ def _split_thinking(message):
 # The node
 # --------------------------------------------------------------------------- #
 
+_TOOLTIPS = {
+    "prompt": "The user message sent to the model. When images are connected, it comes after them.",
+    "server_mode": "auto_start: this node launches llama-server for you (and stops it afterwards unless keep_loaded is on). external_server: use a llama-server you already started on 'port'.",
+    "model": "GGUF model to run. The list is built from ComfyUI's text_encoders/clip folders, models/LLM, EXTRA_MODEL_DIRS and LLAMA_GGUF_DIRS. Press R after adding files.",
+    "model_gpu": "GPU that runs the model. 'all GPUs' lets llama.cpp split it across every GPU. GPU 0 / GPU 1 use the device name from device_prefix (see llama-server --list-devices).",
+    "mmproj": "Vision projector (mmproj) file that matches the model. Only loaded when an image is connected. Use 'none' for text-only.",
+    "mmproj_gpu": "Where the vision projector runs: on the same GPU as the model, on a specific GPU, or on the CPU (slower, but saves VRAM).",
+    "max_length": "Maximum number of new tokens the model may generate. It also counts toward context_size.",
+    "sampling": "On: random sampling using temperature, top_k, top_p, min_p and seed. Off: greedy decoding (always the most likely token), which gives the same text every time.",
+    "temperature": "Randomness of the sampling. Lower = more focused and repeatable, higher = more varied. Used when sampling is on.",
+    "top_k": "Only the K most likely tokens are considered at each step. 0 disables it. Used when sampling is on.",
+    "top_p": "Nucleus sampling: only the smallest group of tokens whose probabilities add up to this value is considered. 1.0 disables it. Used when sampling is on.",
+    "min_p": "Drops tokens whose probability is below this fraction of the most likely token's probability. 0 disables it. Used when sampling is on.",
+    "repetition_penalty": "Penalizes tokens that already appeared. 1.0 = no penalty; slightly above 1 (e.g. 1.1) reduces repetition.",
+    "presence_penalty": "Penalizes any token that has already appeared at least once, pushing the model toward new topics. 0 = off.",
+    "seed": "Seed for the sampling. The same seed with the same settings gives the same text.",
+    "thinking": "Asks models whose chat template supports it to reason before answering (enable_thinking). The reasoning goes to the 'thinking' output. No effect on other models.",
+    "keep_loaded": "Off: the server is stopped after every run, freeing VRAM for the rest of the workflow. On: the server stays up for faster repeated runs, but its VRAM stays in use. Only applies to auto_start.",
+    "system_prompt": "System message that defines the model's role and rules.",
+    "image": "Image for vision models (needs an mmproj). Only the first image of a batch is used. With 2 or more images they are labelled 'Image 1:', 'Image 2:' ... in input order.",
+    "image_2": "Extra image, labelled 'Image N:' in input order. Only the first image of a batch is used.",
+    "image_3": "Extra image, labelled 'Image N:' in input order. Only the first image of a batch is used.",
+    "image_4": "Extra image, labelled 'Image N:' in input order. Only the first image of a batch is used.",
+    "image_5": "Extra image, labelled 'Image N:' in input order. Only the first image of a batch is used.",
+    "model_path_override": "Full path to a .gguf file. Takes priority over the 'model' list.",
+    "mmproj_path_override": "Full path to an mmproj .gguf file. Takes priority over the 'mmproj' list.",
+    "llama_server_path": "Path to the llama-server executable. Leave it as 'llama-server' if it is on your PATH. The file name must contain 'llama'.",
+    "device_prefix": "Device name prefix used by GPU 0 / GPU 1, as printed by 'llama-server --list-devices' without the number (for example CUDA or Vulkan).",
+    "context_size": "Context window in tokens (-c). It must fit the system prompt, the prompt, the image tokens and max_length. Larger values use more VRAM.",
+    "n_gpu_layers": "How many model layers are offloaded to the GPU (-ngl). 99 = all of them. Lower it if you run out of VRAM (the rest runs on the CPU, which is slower).",
+    "port": "Local port used by llama-server (127.0.0.1).",
+    "extra_args": "Extra command line arguments passed to llama-server, for example: --threads 8",
+    "override_instructions": "Instructions that take priority over the system prompt, the prompt and what the images show, wherever they conflict. Examples: 'ignore the text on the sign', 'make the hair red'.",
+    "unload_comfy_models": "Before starting the server, unloads the models ComfyUI left in VRAM (same as the Unload Models button), so they do not pile up with llama-server's model.",
+}
+
+
+def _with_tooltips(spec):
+    """Attach the hover text of every input (the 'tooltip' option of the ComfyUI input spec)."""
+    for section in spec.values():
+        for name, entry in list(section.items()):
+            tip = _TOOLTIPS.get(name)
+            if tip:
+                opts = dict(entry[1]) if len(entry) > 1 else {}
+                opts["tooltip"] = tip
+                section[name] = (entry[0], opts)
+    return spec
+
+
 class LlamaServerGenerateTextV2:
     CATEGORY = "utils/LLM"
     FUNCTION = "generate"
     RETURN_TYPES = ("STRING", "STRING")
     RETURN_NAMES = ("generated_text", "thinking")
+    OUTPUT_TOOLTIPS = (
+        "The text generated by the model.",
+        "The model's reasoning text, when thinking is on and the model produces one.",
+    )
+    DESCRIPTION = (
+        "Runs a GGUF language or vision model through llama.cpp's llama-server and returns the "
+        "generated text. Up to 5 images, per-GPU placement, automatic VRAM handling."
+    )
 
     @classmethod
     def INPUT_TYPES(cls):
         models, mmprojs = _scan()
         model_list = sorted(models) or [_NO_FILES]
         mmproj_list = ["none"] + sorted(mmprojs)
-        return {
+        return _with_tooltips({
             "required": {
                 "prompt": ("STRING", {"multiline": True, "default": ""}),
                 "server_mode": (["auto_start", "external_server"],),
@@ -613,7 +670,7 @@ class LlamaServerGenerateTextV2:
                 "override_instructions": ("STRING", {"multiline": True, "default": ""}),
                 "unload_comfy_models": ("BOOLEAN", {"default": True}),
             },
-        }
+        })
 
     def generate(self, prompt, server_mode, model, model_gpu, mmproj, mmproj_gpu,
                  max_length, sampling, temperature, top_k, top_p, min_p,
